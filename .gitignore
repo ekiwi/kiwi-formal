@@ -1,0 +1,13 @@
+.bloop
+.metals
+.idea
+.jvmops
+target
+project/*
+build/*
+*.f
+*.v
+*.sv
+*.fir
+*.conf
+*.anno.json
