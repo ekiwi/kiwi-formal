@@ -51,28 +51,37 @@ class CoverBranchesTransform extends Transform with DependencyAPIMigration {
 
     def onModule(m: firrtl.ir.Module) = {
         var clk: Port = null
-        var rst: Port = null
         m.foreachPort({ port=>
             if (port.name.matches("clock")) {
                 clk = port; 
             }
-            if (port.name.matches("reset")) {
-                rst = port;
-            }
         })
         assert(clk != null)
-        assert(rst != null)
+
+        var reset_done: DefWire = null
+        def retrieveResetDone(s: Statement) {
+            s match {
+                case w: DefWire => if (w.name.equals("_reset_done")) {
+                    assert(reset_done == null)
+                    reset_done = w
+                }
+                case b: Block => b.foreachStmt(retrieveResetDone)
+                case _ =>
+            }
+        }
+        retrieveResetDone(m.body)
+        assert(reset_done != null)
 
         val toCover = new scala.collection.mutable.ArrayBuffer[BranchToCover]()
 
         m.foreachStmt(s => onStatement(toCover, UIntLiteral(1), s))
         
-        val notReset = DoPrim(Not, Seq(Reference(rst)), Nil, rst.tpe)
+        val enable = Reference(reset_done)
 
         val nb = new ArrayBuffer[Statement]()
         nb.append(m.body)
         toCover.foreach({ c =>
-            val cover = Verification(Formal.Cover, c.info, Reference(clk), c.predicate, notReset, StringLit(""))
+            val cover = Verification(Formal.Cover, c.info, Reference(clk), c.predicate, enable, StringLit(""))
             nb.append(cover)
         })
         
@@ -82,11 +91,6 @@ class CoverBranchesTransform extends Transform with DependencyAPIMigration {
     protected def execute(state: firrtl.CircuitState) = {
         val cover    = state.annotations.collect { case CoverBranchesAnnotation(target)      => target.name }.toSet
         val notCover = state.annotations.collect { case DoNotCoverBranchesAnnotation(target) => target.name }.toSet
-        println(cover)
-        println(notCover)
-        state.circuit.foreachModule({
-            case m: firrtl.ir.Module => println(m.name)
-        })
         state.copy(circuit = state.circuit.mapModule({
             case m: firrtl.ir.Module if (cover.contains(m.name) && (!notCover.contains(m.name))) => onModule(m)
             case other => other
