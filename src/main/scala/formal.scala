@@ -59,13 +59,13 @@ abstract class FormalModule extends Module {
         }
     }
 
-    def afterReset(n: Int = 1)(block: => Any) {
+    def afterReset(n: Int = 1)(block: => Any): WhenContext = {
         val counter = RegInit(n.U)
-        when (_reset_done) {
-            when (counter > 0.U) {
-                counter := counter - 1.U;
-            }.otherwise(block)
+        when (_reset_done && (counter > 0.U)) {
+            counter := counter - 1.U;
         }
+
+        when(_reset_done && (counter === 0.U))(block)
     }
 
     // TODO: past
