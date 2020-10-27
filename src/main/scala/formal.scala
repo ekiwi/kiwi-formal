@@ -4,6 +4,7 @@ import dank.formal.transforms._
 
 import firrtl.Transform
 import chisel3._
+import chisel3.util.ShiftRegister
 import chisel3.util.HasBlackBoxInline
 import chisel3.experimental.verification
 import chisel3.experimental.ChiselAnnotation
@@ -68,7 +69,9 @@ abstract class FormalModule extends Module {
         when(_reset_done && (counter === 0.U))(block)
     }
 
-    // TODO: past
+    def past[T <: Data](signal: T, cycles: Int = 1): T = {
+        ShiftRegister(signal, cycles)
+    }
 }
 
 class ResetDetectorIO extends Bundle {
