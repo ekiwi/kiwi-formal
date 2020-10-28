@@ -83,13 +83,13 @@ class ResetDetectorIO extends Bundle {
 class ResetDetector extends BlackBox with HasBlackBoxInline {
   val io = IO(new ResetDetectorIO)
   setInline("ResetDetector.sv",
-    s"""module ResetCounter(
+    s"""module ResetDetector(
        |  input clock,
        |  input reset,
        |  output reset_done
        |);
        |  reg _reset_done = 0;
-       |  reset_done = _reset_done;
+       |  assign reset_done = _reset_done;
        |
        |  always @(posedge clock) begin
        |    if (reset) begin
