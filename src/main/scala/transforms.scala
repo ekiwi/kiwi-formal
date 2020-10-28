@@ -27,25 +27,22 @@ class CoverBranchesTransform extends Transform with DependencyAPIMigration {
         return r
     }
 
-    case class BranchToCover(predicate: Expression, info: Info)
+    case class BranchToCover(s: Statement, info: Info)
 
-    def onStatement(toCover: ArrayBuffer[BranchToCover], pred: Expression, s: Statement) {
+    def onStatement(toCover: ArrayBuffer[BranchToCover], s: Statement) {
         s match {
             case c: Conditionally => {
-                val conseqPred = DoPrim(And, Seq(pred, c.pred), Nil, pred.tpe)
-                val altPred = DoPrim(And, Seq(pred, DoPrim(Not, Seq(c.pred), Nil, pred.tpe)), Nil, pred.tpe)
-                
                 if (needsCover(c.conseq)) {
-                    toCover.append(BranchToCover(conseqPred, c.info))
-                    c.conseq.foreachStmt(s => onStatement(toCover, conseqPred, s))
+                    toCover.append(BranchToCover(c.conseq, c.info))
+                    c.conseq.foreachStmt(s => onStatement(toCover, s))
                 }
 
                 if (needsCover(c.alt)) {
-                    toCover.append(BranchToCover(altPred, c.info))
-                    c.alt.foreachStmt(s => onStatement(toCover, altPred, s))
+                    toCover.append(BranchToCover(c.alt, c.info))
+                    c.alt.foreachStmt(s => onStatement(toCover, s))
                 }
             }
-            case _ => s.foreachStmt(s => onStatement(toCover, pred, s))
+            case _ => s.foreachStmt(s => onStatement(toCover, s))
         }
     }
 
@@ -74,18 +71,26 @@ class CoverBranchesTransform extends Transform with DependencyAPIMigration {
 
         val toCover = new scala.collection.mutable.ArrayBuffer[BranchToCover]()
 
-        m.foreachStmt(s => onStatement(toCover, UIntLiteral(1), s))
+        m.foreachStmt(s => onStatement(toCover, s))
         
         val enable = Reference(reset_done)
 
-        val nb = new ArrayBuffer[Statement]()
-        nb.append(m.body)
-        toCover.foreach({ c =>
-            val cover = Verification(Formal.Cover, c.info, Reference(clk), c.predicate, enable, StringLit(""))
-            nb.append(cover)
-        })
-        
-        m.copy(body = Block(nb.toSeq))
+        def mapStatements(s: Statement): Statement = {
+            var branch_to_cover: BranchToCover = null;
+            toCover.foreach({ b=>
+                if (s eq b.s) {
+                    branch_to_cover = b
+                }
+            })
+            
+            if (branch_to_cover != null) {
+                val cover = Verification(Formal.Cover, branch_to_cover.info, Reference(clk), enable, UIntLiteral(1), StringLit(""))
+                Block(Seq(s.mapStmt(mapStatements), cover))
+            } else {
+                s.mapStmt(mapStatements)
+            }
+        }
+        m.mapStmt(mapStatements)
     }
 
     protected def execute(state: firrtl.CircuitState) = {
