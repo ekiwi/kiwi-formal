@@ -11,3 +11,16 @@ build/*
 *.fir
 *.conf
 *.anno.json
+*.ys
+*.il
+*.xml
+*.smt
+*.smtc
+*.smt2
+*.log
+*.sby
+*.vcd
+logfile.txt
+PASS
+FAIL
+status
