@@ -9,6 +9,7 @@ import chisel3.util.HasBlackBoxInline
 import chisel3.experimental.verification
 import chisel3.experimental.ChiselAnnotation
 import chisel3.experimental.RunFirrtlTransform
+import chisel3.internal.sourceinfo.SourceInfo
 
 /** Add cover statements to branches.
   * 
@@ -42,25 +43,25 @@ abstract class FormalModule extends Module {
     _reset_detector.io.reset := reset
     val _reset_done = dontTouch(WireInit(_reset_detector.io.reset_done))
 
-    def assert(predicate: Bool, msg: String = ""): Unit = {
+    def assert(predicate: Bool, msg: String = "")(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
         when (_reset_done) {
             verification.assert(predicate, msg)
         }
     }
 
-    def cover(predicate: Bool, msg: String = ""): Unit = {
+    def cover(predicate: Bool, msg: String = "")(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
         when (_reset_done) {
             verification.cover(predicate, msg)
         }
     }
 
-    def assume(predicate: Bool, msg: String = ""): Unit = {
+    def assume(predicate: Bool, msg: String = "")(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
         when (_reset_done) {
             verification.assume(predicate, msg)
         }
     }
 
-    def afterReset(n: Int = 1)(block: => Any): WhenContext = {
+    def afterReset(n: Int = 1)(block: => Any)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): WhenContext = {
         val counter = RegInit(n.U)
         when (_reset_done && (counter > 0.U)) {
             counter := counter - 1.U;
@@ -69,7 +70,7 @@ abstract class FormalModule extends Module {
         when(_reset_done && (counter === 0.U))(block)
     }
 
-    def past[T <: Data](signal: T, cycles: Int = 1): T = {
+    def past[T <: Data](signal: T, cycles: Int = 1)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): T = {
         ShiftRegister(signal, cycles)
     }
 }
