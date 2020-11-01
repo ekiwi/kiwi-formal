@@ -21,6 +21,7 @@ build/*
 *.sby
 *.vcd
 logfile.txt
+logfile_*.txt
 PASS
 FAIL
 status
