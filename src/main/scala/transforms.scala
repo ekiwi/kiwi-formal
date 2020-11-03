@@ -21,6 +21,7 @@ class CoverBranchesTransform extends Transform with DependencyAPIMigration {
             case _: Verification =>
             case _: Print =>
             case _: Stop =>
+            case _: Conditionally => s.foreachStmt(r |= needsCover(_))
             case _: Block => s.foreachStmt(r |= needsCover(_))
             case _ => r = true
         }
