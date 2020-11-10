@@ -25,10 +25,10 @@ trait CoverBranches { m: chisel3.Module =>
 }
 
 /** Do not add cover statements to branches.
- * 
- * This trait disables CoverBranches. If a module is annotated with both, cover statements will not
- * be added.
- */
+  * 
+  * This trait disables CoverBranches. If a module is annotated with both, cover statements will not
+  * be added.
+  */
 trait DoNotCoverBranches { m: chisel3.Module =>
     chisel3.experimental.annotate(new ChiselAnnotation {
         def toFirrtl = DoNotCoverBranchesAnnotation(m.toNamed)
