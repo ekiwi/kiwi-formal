@@ -15,7 +15,7 @@ class SbyException(val message: String) extends Exception(message)
 /** SymbiYosys operation. */
 class SbyRun[T<:FormalModule](gen: => T, mode: String, depth: Int = 20, base: String = "")(implicit c: ClassTag[T]) {
     /* Generate job name. */
-    val jobname = base + classTag[T].toString + "_" + mode + depth.toString
+    val jobname = "formal_output/" + base + classTag[T].toString + "_" + mode + "_" + depth.toString
 
     /* Generate SystemVerilog for the module. */
     val stage = new chisel3.stage.ChiselStage
