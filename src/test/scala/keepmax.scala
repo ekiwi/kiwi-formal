@@ -26,7 +26,10 @@ class KeepMax(width: Int) extends CoveredFormalModule {
 class KeepMaxTest extends FlatSpec with FormalTester {
     behavior of "KeepMax"
 
-    cover(new KeepMax(16))
-    prove(new KeepMax(16))
-    bmc(new KeepMax(16))
+    /* Run multiple tests as a regression test for #1. */
+    for (i <- 1 until 16) {
+        cover(new KeepMax(i))
+        prove(new KeepMax(i))
+        bmc(new KeepMax(i))
+    }
 }
