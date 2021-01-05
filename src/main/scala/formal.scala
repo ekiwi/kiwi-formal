@@ -1,15 +1,13 @@
 package dank.formal
 
 import dank.formal.transforms._
-
 import firrtl.Transform
 import chisel3._
 import chisel3.util.ShiftRegister
 import chisel3.util.HasBlackBoxInline
-import chisel3.experimental.verification
-import chisel3.experimental.ChiselAnnotation
-import chisel3.experimental.RunFirrtlTransform
+import chisel3.experimental.{ChiselAnnotation, RunFirrtlTransform, annotate, verification}
 import chisel3.internal.sourceinfo.SourceInfo
+import firrtl.annotations.PresetAnnotation
 
 /** Add cover statements to branches.
   * 
@@ -38,9 +36,7 @@ trait DoNotCoverBranches { m: chisel3.Module =>
 /** Chisel Module with formal verification. */
 abstract class FormalModule extends Module {
     val _reset_detector = Module(new ResetDetector)
-    _reset_detector.io.clock := clock
-    _reset_detector.io.reset := reset
-    val _reset_done = dontTouch(WireInit(_reset_detector.io.reset_done))
+    val _reset_done = dontTouch(WireInit(_reset_detector.resetDone))
 
     /** Add an assert verification statement. */
     def assert(predicate: Bool, msg: String = "")(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
@@ -94,30 +90,20 @@ abstract class FormalModule extends Module {
     }
 }
 
-class ResetDetectorIO extends Bundle {
-  val clock = Input(Clock())
-  val reset = Input(Reset())
-  val reset_done = Output(Bool())
-}
 
-class ResetDetector extends BlackBox with HasBlackBoxInline {
-  val io = IO(new ResetDetectorIO)
-  setInline("ResetDetector.sv",
-    s"""module ResetDetector(
-       |  input clock,
-       |  input reset,
-       |  output reset_done
-       |);
-       |  reg _reset_done = 0;
-       |  assign reset_done = _reset_done;
-       |
-       |  always @(posedge clock) begin
-       |    if (reset) begin
-       |      _reset_done <= 1;
-       |    end
-       |  end
-       |endmodule
-       |""".stripMargin)
+class ResetDetector extends MultiIOModule {
+  val resetDone = IO(Output(Bool()))
+  val preset = WireInit(false.B.asAsyncReset())
+  annotate(new ChiselAnnotation {
+    override def toFirrtl = PresetAnnotation(preset.toTarget)
+  })
+  withReset(preset) {
+    val resetDoneReg = RegInit(false.B)
+    resetDone := resetDoneReg
+    when(reset.asBool()) {
+      resetDoneReg := true.B
+    }
+  }
 }
 
 abstract class CoveredFormalModule extends FormalModule with CoverBranches
