@@ -23,9 +23,18 @@ jobs:
         sudo apt-get install -y verilator
         verilator --version
 
+    - name: Cache Yosys
+      id: cache-yosys
+      uses: actions/cache@v2
+      with:
+        path: yosys
+        key: ${{ runner.os }}-yosys-b00e55a
+
     - name: Install Yosys
+      if: steps.cache-yosys.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/YosysHQ/yosys.git yosys
+        git checkout b00e55a
         cd yosys
         sudo apt-get install -y build-essential clang bison flex \
             libreadline-dev gawk tcl-dev libffi-dev git \
