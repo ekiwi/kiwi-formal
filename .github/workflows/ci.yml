@@ -30,7 +30,7 @@ jobs:
         path: yosys
         key: ${{ runner.os }}-yosys-b00e55a
 
-    - name: Install Yosys
+    - name: Compile Yosys
       if: steps.cache-yosys.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/YosysHQ/yosys.git yosys
@@ -42,7 +42,12 @@ jobs:
             libboost-python-dev libboost-filesystem-dev zlib1g-dev
         make config-gcc
         make -j
+
+    - name: Install Yosys
+      run: |
+        cd yosys
         sudo make install
+        yosys -version
 
     - name: Install SymbiYosys
       run: |
