@@ -17,7 +17,7 @@ class AssumeFalseModule extends CoveredFormalModule {
     }
 }
 
-class Smoketest extends FlatSpec with FormalTester {
+class AssumeFalseTest extends FlatSpec with FormalTester {
     behavior of "AssumeFalseModule"
 
     cover(new AssumeFalseModule)

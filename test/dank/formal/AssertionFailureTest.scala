@@ -37,7 +37,7 @@ class AssertionFailureTest extends FlatSpec {
             new SbyRun(new ModuleWithBadAssertion, "prove").throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("assertionfailure.scala"))
+            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 
@@ -46,7 +46,7 @@ class AssertionFailureTest extends FlatSpec {
             new SbyRun(new ModuleWithBadAssertion, "cover").throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("assertionfailure.scala"))
+            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 
@@ -55,7 +55,7 @@ class AssertionFailureTest extends FlatSpec {
             new SbyRun(new ModuleWithBadAssertion, "bmc").throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("assertionfailure.scala"))
+            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 }

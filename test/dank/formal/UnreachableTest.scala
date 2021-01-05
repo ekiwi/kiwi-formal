@@ -28,7 +28,7 @@ class UnreachableTest extends FlatSpec {
             new SbyRun(new ModuleWithUnreachableStatements, "cover").throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("unreachable.scala"))
+            case e: SbyException => assert(e.message.contains("UnreachableTest.scala"))
         }
     }
 }
