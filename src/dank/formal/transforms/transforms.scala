@@ -1,14 +1,13 @@
 package dank.formal.transforms
 
-import scala.collection.mutable.ArrayBuffer
 import firrtl._
-import firrtl.transforms._
-import firrtl.ir._
-import firrtl.PrimOps._
 import firrtl.annotations._
+import firrtl.ir._
 import firrtl.options.Dependency
-import firrtl.stage.TransformManager
 import firrtl.passes.ExpandWhens
+import firrtl.transforms._
+
+import scala.collection.mutable.ArrayBuffer
 
 class CoverBranchesTransform extends Transform with DependencyAPIMigration {
     override def prerequisites = Seq(Dependency[InferResets])

@@ -1,6 +1,5 @@
-package dank.formal.test.smoketest
+package dank.formal
 
-import dank.formal._
 import org.scalatest._
 import chisel3._
 

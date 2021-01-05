@@ -5,6 +5,8 @@ lazy val commonSettings = Seq(
   scalacOptions += "-Xsource:2.11",
   libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.4.1",
   libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8",
+  scalaSource in Compile := baseDirectory.value / "src",
+  scalaSource in Test := baseDirectory.value / "test",
 )
 
 lazy val main = (project in file(".")).

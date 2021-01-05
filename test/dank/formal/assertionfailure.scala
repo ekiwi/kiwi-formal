@@ -1,6 +1,5 @@
-package dank.formal.test.assertionfailure
+package dank.formal
 
-import dank.formal._
 import dank.formal.sby._
 import org.scalatest._
 import chisel3._

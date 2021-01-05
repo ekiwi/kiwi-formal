@@ -1,11 +1,10 @@
-package dank.formal.test.unreachable
+package dank.formal
 
-import dank.formal._
 import dank.formal.sby._
 import org.scalatest._
 import chisel3._
 
-class ModuleWithUnreachaleStatements extends CoveredFormalModule {
+class ModuleWithUnreachableStatements extends CoveredFormalModule {
     val io = IO(new Bundle {
         val in = Input(Bool())
         val out = Output(Bool())
@@ -26,7 +25,7 @@ class UnreachableTest extends FlatSpec {
 
     it should "detect uncovered branches" in {
         try {
-            new SbyRun(new ModuleWithUnreachaleStatements, "cover").throwErrors()
+            new SbyRun(new ModuleWithUnreachableStatements, "cover").throwErrors()
             assert(false)
         } catch {
             case e: SbyException => assert(e.message.contains("unreachable.scala"))

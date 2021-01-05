@@ -3,12 +3,13 @@ package dank.formal.sby
 import chisel3._
 import chisel3.stage._
 import dank.formal._
-import scala.reflect._
 import firrtl.EmittedVerilogCircuitAnnotation
 import firrtl.transforms.BlackBoxInlineAnno
-import scala.collection.mutable.ArrayBuffer
+
 import java.io._
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
+import scala.reflect._
 
 class SbyException(val message: String) extends Exception(message)
 
@@ -19,7 +20,7 @@ class SbyRun[T<:FormalModule](gen: => T, mode: String, depth: Int = 20, base: St
 
     /* Generate SystemVerilog for the module. */
     val stage = new chisel3.stage.ChiselStage
-    val annotations = stage.execute(Array("-X", "sverilog", "--target-dir", jobname), Seq(ChiselGeneratorAnnotation(() => gen)))
+    val annotations = stage.execute(Array("-X", "sverilog", "--target-dir", jobname, "-ll", "trace"), Seq(ChiselGeneratorAnnotation(() => gen)))
     val files = new ArrayBuffer[String]
     var module_name: String = null
     annotations.foreach({
