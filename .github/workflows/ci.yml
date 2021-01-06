@@ -50,6 +50,18 @@ jobs:
         sudo make install
         yosys -version
 
+    - name: Compile and Install Yices2
+      run: |
+        sudo apt install -y gperf
+        wget https://github.com/SRI-CSL/yices2/archive/Yices-2.6.2.zip
+        unzip Yices-2.6.2.zip
+        cd yices2-Yices-2.6.2/
+        autoconf
+        ./configure
+        make -j2
+        sudo make install
+        yices-smt2 --version
+
     - name: Install SymbiYosys
       run: |
         git clone https://github.com/YosysHQ/SymbiYosys.git SymbiYosys
