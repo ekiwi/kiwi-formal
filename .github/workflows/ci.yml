@@ -34,25 +34,26 @@ jobs:
       id: cache-yosys
       uses: actions/cache@v2
       with:
-        path: yosys
-        key: ${{ runner.os }}-yosys-b00e55a
+        path: |
+          /usr/local/bin/yosys
+          /usr/local/bin/yosys-abc
+          /usr/local/bin/yosys-filterlib
+          /usr/local/bin/yosys-smtbmc
+          /usr/local/share/yosys
+        key: ${{ runner.os }}-yosys-b000491
 
-    - name: Compile Yosys
+    - name: Compile and Install Yosys
       if: steps.cache-yosys.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/YosysHQ/yosys.git yosys
         cd yosys
-        git checkout b00e55a
+        git checkout b000491
         sudo apt-get install -y build-essential clang bison flex \
             libreadline-dev gawk tcl-dev libffi-dev git \
             graphviz xdot pkg-config python3 libboost-system-dev \
             libboost-python-dev libboost-filesystem-dev zlib1g-dev
         make config-gcc
         make -j2
-
-    - name: Install Yosys
-      run: |
-        cd yosys
         sudo make install
         yosys -version
 
