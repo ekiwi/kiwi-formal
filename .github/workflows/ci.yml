@@ -41,7 +41,7 @@ jobs:
             graphviz xdot pkg-config python3 libboost-system-dev \
             libboost-python-dev libboost-filesystem-dev zlib1g-dev
         make config-gcc
-        make -j
+        make -j2
 
     - name: Install Yosys
       run: |
