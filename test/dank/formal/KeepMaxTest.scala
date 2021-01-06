@@ -27,8 +27,10 @@ class KeepMaxTest extends AnyFlatSpec with SymbiYosysTester {
 
     /* Run multiple tests as a regression test for #1. */
     for (i <- 1 until 16) {
-        cover(new KeepMax(i), 20)
-        prove(new KeepMax(i))
-        bmc(new KeepMax(i), 20)
+        it should s"work for i = $i" in {
+            cover(new KeepMax(i), 20).throwErrors()
+            prove(new KeepMax(i)).throwErrors()
+            bmc(new KeepMax(i), 20).throwErrors()
+        }
     }
 }
