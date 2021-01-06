@@ -1,7 +1,7 @@
 package dank.formal
 
-import dank.formal.sby._
-import org.scalatest._
+import dank.formal.backends._
+import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
 class ModuleWithBadAssertion extends FormalModule {
@@ -29,12 +29,12 @@ class ModuleWithBadAssertion extends FormalModule {
     assert(aReg && bReg)
 }
 
-class AssertionFailureTest extends FlatSpec {
+class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "SbyRun"
 
     it should "detect assertion failures when proving" in {
         try {
-            new SbyRun(new ModuleWithBadAssertion, "prove").throwErrors()
+            prove(new ModuleWithBadAssertion).throwErrors()
             assert(false)
         } catch {
             case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -43,7 +43,7 @@ class AssertionFailureTest extends FlatSpec {
 
     it should "detect assertion failures when covering" in {
         try {
-            new SbyRun(new ModuleWithBadAssertion, "cover").throwErrors()
+            cover(new ModuleWithBadAssertion, 20).throwErrors()
             assert(false)
         } catch {
             case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -52,7 +52,7 @@ class AssertionFailureTest extends FlatSpec {
 
     it should "detect assertion failures when running bmc" in {
         try {
-            new SbyRun(new ModuleWithBadAssertion, "bmc").throwErrors()
+            bmc(new ModuleWithBadAssertion, 20).throwErrors()
             assert(false)
         } catch {
             case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))

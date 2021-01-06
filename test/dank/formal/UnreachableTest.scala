@@ -1,8 +1,8 @@
 package dank.formal
 
-import dank.formal.sby._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
+import dank.formal.backends.SbyException
 
 class ModuleWithUnreachableStatements extends CoveredFormalModule {
     val io = IO(new Bundle {
@@ -20,12 +20,12 @@ class ModuleWithUnreachableStatements extends CoveredFormalModule {
     }
 }
 
-class UnreachableTest extends FlatSpec {
+class UnreachableTest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "SbyRun"
 
     it should "detect uncovered branches" in {
         try {
-            new SbyRun(new ModuleWithUnreachableStatements, "cover").throwErrors()
+            cover(new ModuleWithUnreachableStatements, 20).throwErrors()
             assert(false)
         } catch {
             case e: SbyException => assert(e.message.contains("UnreachableTest.scala"))

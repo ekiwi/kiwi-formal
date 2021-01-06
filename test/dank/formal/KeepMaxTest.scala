@@ -1,6 +1,6 @@
 package dank.formal
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
 /* This module is tested because it uses past values. */
@@ -22,13 +22,13 @@ class KeepMax(width: Int) extends CoveredFormalModule {
     }
 }
 
-class KeepMaxTest extends FlatSpec with FormalTester {
+class KeepMaxTest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "KeepMax"
 
     /* Run multiple tests as a regression test for #1. */
     for (i <- 1 until 16) {
-        cover(new KeepMax(i))
+        cover(new KeepMax(i), 20)
         prove(new KeepMax(i))
-        bmc(new KeepMax(i))
+        bmc(new KeepMax(i), 20)
     }
 }

@@ -1,6 +1,6 @@
 package dank.formal
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
 class AssumeFalseModule extends CoveredFormalModule {
@@ -17,8 +17,10 @@ class AssumeFalseModule extends CoveredFormalModule {
     }
 }
 
-class AssumeFalseTest extends FlatSpec with FormalTester {
+class AssumeFalseTest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "AssumeFalseModule"
 
-    cover(new AssumeFalseModule)
+    it should "cover" in {
+        cover(new AssumeFalseModule, 20)
+    }
 }

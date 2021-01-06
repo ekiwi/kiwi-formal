@@ -1,4 +1,4 @@
-package dank.formal.sby
+package dank.formal.backends
 
 import chisel3._
 import chisel3.stage._
@@ -103,7 +103,7 @@ class SbyRun[T<:FormalModule](gen: => T, mode: String, depth: Int = 20, base: St
     
     /** Throws an exception iff there were errors in the run. */
     def throwErrors() {
-        if (errors.length != 0) {
+        if (errors.nonEmpty) {
             throw new SbyException(errors.mkString("\n"))
         }
     }

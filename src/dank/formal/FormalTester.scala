@@ -1,42 +1,77 @@
+// Copyright 2020 The Regents of the University of California
+// released under BSD 3-Clause License
+// author: Kevin Laeufer <laeufer@cs.berkeley.edu>
+
 package dank.formal
 
-import dank.formal.sby._
+import dank.formal.backends._
 import org.scalatest._
-import scala.reflect._
+import chisel3._
+import chiseltest.experimental.sanitizeFileName
+import firrtl.AnnotationSeq
+import firrtl.options.TargetDirAnnotation
 
-/** Trait used to simplify running formal verification. */
-trait FormalTester { this: FlatSpec =>
-    /** Counter used to give each test a unique name. */
-    private var counter = 0
+import java.io.File
+import scala.util.DynamicVariable
 
-    /** Generate basename for new test. */
-    private def getTestName() = {
-        val name = this.suiteName + ":" + counter.toString
-        counter += 1
-        name
+/** uses symbi yosys as default backend */
+trait SymbiYosysTester extends FormalTester { this: TestSuite =>
+    override val defaultBackend = Some(Backend.symbiYosys)
+}
+
+/** FormalTester trait for scalatest, based on code copied from chisel-test */
+trait FormalTester extends Assertions with TestSuiteMixin {
+    this: TestSuite =>
+
+    /** override with Some backend to use by default */
+    val defaultBackend: Option[() => Backend] = None
+
+    /** convenience method to run bmc with default options and backend */
+    def bmc(gen: => RawModule, depth: Int, annos: AnnotationSeq = Seq()): BoundedCheckResult = {
+        run(BoundedCheck(depth), VerificationOptions(), gen, annos).asInstanceOf[BoundedCheckResult]
+    }
+    /** convenience method to run a bounded cover with default options and backend */
+    def cover(gen: => RawModule, depth: Int, annos: AnnotationSeq = Seq()): BoundedCoverResult = {
+        run(BoundedCover(depth), VerificationOptions(), gen, annos).asInstanceOf[BoundedCoverResult]
+    }
+    /** convenience method to run an unbounded proof with default options and backend */
+    def prove(gen: => RawModule, annos: AnnotationSeq = Seq()): ProveResult = {
+        run(Prove(), VerificationOptions(), gen, annos).asInstanceOf[ProveResult]
     }
 
-    /** Generate traces to reach all cover statement. */
-    def cover[T<:FormalModule](gen: => T, depth: Int = 20)(implicit c: ClassTag[T]) {
-        val name = getTestName()
-        it must ("be covered - " + name) in {
-            new SbyRun(gen, "cover", depth, name + "_").throwErrors()
+    /** run a verification task */
+    def run(op: VerificationOp, opts: VerificationOptions, gen: => RawModule, annos: AnnotationSeq = Seq(), backend: Option[() => Backend] = None): VerificationResult = {
+        val engine = backend.getOrElse(defaultBackend.getOrElse(throw new RuntimeException("Need to specify a backend or defaultBackend!")))()
+        val finalAnnos = addDefaultTargetDir(getTestName, annos)
+        engine.run(op, opts, () => gen, finalAnnos)
+    }
+
+    protected def getTestName: String = sanitizeFileName(scalaTestContext.value.get.name)
+
+    // Provide test fixture data as part of 'global' context during test runs
+    private val scalaTestContext = new DynamicVariable[Option[NoArgTest]](None)
+
+    abstract override def withFixture(test: NoArgTest): Outcome = {
+        require(scalaTestContext.value.isEmpty)
+        scalaTestContext.withValue(Some(test)) {
+            super.withFixture(test)
         }
     }
 
-    /** Unbounded model check to verify assertions. */
-    def prove[T<:FormalModule](gen: => T, depth: Int = 20)(implicit c: ClassTag[T]) {
-        val name = getTestName()
-        it must ("be proven - " + name) in {
-            new SbyRun(gen, "prove", depth, name + "_").throwErrors()
-        }
-    }
-
-    /** Bounded model check to verify assertions. */
-    def bmc[T<:FormalModule](gen: => T, depth: Int = 20)(implicit c: ClassTag[T]) {
-        val name = getTestName()
-        it must ("pass bounded model check with depth " + depth.toString + " - " + name) in {
-            new SbyRun(gen, "bmc", depth, name + "_").throwErrors()
+    /**
+      * Will add a TargetDirAnnotation with defaultDir with "test_run_dir" path prefix to the annotations
+      * if there is not a TargetDirAnnotation already present
+      *
+      * @param defaultDir     a default directory
+      * @param annotationSeq  annotations to add it to, unless one is already there
+      * @return
+      */
+    private def addDefaultTargetDir(defaultDir: String, annotationSeq: AnnotationSeq): AnnotationSeq = {
+        if (annotationSeq.exists { x => x.isInstanceOf[TargetDirAnnotation] }) {
+            annotationSeq
+        } else {
+            val target = TargetDirAnnotation("test_run_dir" + File.separator + defaultDir)
+            AnnotationSeq(annotationSeq ++ Seq(target))
         }
     }
 }

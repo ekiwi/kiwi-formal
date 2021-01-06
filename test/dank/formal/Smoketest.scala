@@ -1,6 +1,6 @@
 package dank.formal
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
 class SmoketestModule extends FormalModule {
@@ -28,10 +28,12 @@ class SmoketestModule extends FormalModule {
     assert(aReg ^ bReg)
 }
 
-class Smoketest extends FlatSpec with FormalTester {
+class Smoketest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "SmoketestModule"
 
-    cover(new SmoketestModule)
-    prove(new SmoketestModule)
-    bmc(new SmoketestModule)
+    it should "not smoke" in {
+        cover(new SmoketestModule, 20)
+        prove(new SmoketestModule)
+        bmc(new SmoketestModule, 20)
+    }
 }
