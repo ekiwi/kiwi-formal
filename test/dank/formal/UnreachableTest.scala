@@ -2,7 +2,7 @@ package dank.formal
 
 import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
-import dank.formal.backends.SbyException
+import dank.formal.backends.VerificationException
 
 class ModuleWithUnreachableStatements extends CoveredFormalModule {
     val io = IO(new Bundle {
@@ -28,7 +28,7 @@ class UnreachableTest extends AnyFlatSpec with SymbiYosysTester {
             cover(new ModuleWithUnreachableStatements, 20).throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("UnreachableTest.scala"))
+            case e: VerificationException => assert(e.message.contains("UnreachableTest.scala"))
         }
     }
 }

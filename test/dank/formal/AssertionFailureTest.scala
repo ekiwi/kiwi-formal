@@ -37,7 +37,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
             prove(new ModuleWithBadAssertion).throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
+            case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 
@@ -46,7 +46,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
             cover(new ModuleWithBadAssertion, 20).throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
+            case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 
@@ -55,7 +55,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
             bmc(new ModuleWithBadAssertion, 20).throwErrors()
             assert(false)
         } catch {
-            case e: SbyException => assert(e.message.contains("AssertionFailureTest.scala"))
+            case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
         }
     }
 }

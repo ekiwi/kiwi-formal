@@ -16,7 +16,7 @@ import scala.util.DynamicVariable
 
 /** uses symbi yosys as default backend */
 trait SymbiYosysTester extends FormalTester { this: TestSuite =>
-    override val defaultBackend = Some(Backend.symbiYosys)
+    override val defaultBackend: Option[() => Backend] = Some(Backend.symbiYosys)
 }
 
 /** FormalTester trait for scalatest, based on code copied from chisel-test */
@@ -43,7 +43,8 @@ trait FormalTester extends Assertions with TestSuiteMixin {
     def run(op: VerificationOp, opts: VerificationOptions, gen: => RawModule, annos: AnnotationSeq = Seq(), backend: Option[() => Backend] = None): VerificationResult = {
         val engine = backend.getOrElse(defaultBackend.getOrElse(throw new RuntimeException("Need to specify a backend or defaultBackend!")))()
         val finalAnnos = addDefaultTargetDir(getTestName, annos)
-        engine.run(op, opts, () => gen, finalAnnos)
+        val dir = finalAnnos.collectFirst { case TargetDirAnnotation(d) => d }.get
+        engine.run(dir, op, opts, () => gen, finalAnnos)
     }
 
     protected def getTestName: String = sanitizeFileName(scalaTestContext.value.get.name)

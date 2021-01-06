@@ -1,12 +1,21 @@
+# Scala
+/target/
+/project/project/
+/project/target/
+
+# Intellij Idea
+/.idea/
+
+# chisel testers
+/test_run_dir/
+
+# Chisel compiler
+/*.v
+/*.fir
+/*.json
+
+
 .bloop
 .metals
-.idea
 .jvmops
-target
-project/*
-build/*
-formal_output/*
-*.sv
-*.json
-*.f
-*.fir
+.bps
