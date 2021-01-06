@@ -47,7 +47,12 @@ trait FormalTester extends Assertions with TestSuiteMixin {
         engine.run(dir, op, opts, () => gen, finalAnnos)
     }
 
-    protected def getTestName: String = sanitizeFileName(scalaTestContext.value.get.name)
+    protected def getTestName: String = {
+        val ctx = scalaTestContext.value.getOrElse(
+            throw new RuntimeException("No test context found! Make sure you are in a unittest.")
+        )
+        sanitizeFileName(ctx.name)
+    }
 
     // Provide test fixture data as part of 'global' context during test runs
     private val scalaTestContext = new DynamicVariable[Option[NoArgTest]](None)
