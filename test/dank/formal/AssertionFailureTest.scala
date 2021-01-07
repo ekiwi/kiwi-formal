@@ -4,7 +4,7 @@ import dank.formal.backends._
 import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
-class ModuleWithBadAssertion extends FormalModule {
+class ModuleAB extends Module {
     val io = IO(new Bundle {
         val in = Input(Bool())
         val a = Output(Bool())
@@ -23,10 +23,12 @@ class ModuleWithBadAssertion extends FormalModule {
         aReg := false.B
         bReg := true.B
     }
+}
 
-    cover(aReg)
-    cover(bReg)
-    assert(aReg && bReg)
+class FailingAssertions(dut: ModuleAB) extends Spec(dut) {
+    cover(dut.aReg)
+    cover(dut.bReg)
+    assert(dut.aReg && dut.bReg)
 }
 
 class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
@@ -34,7 +36,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
 
     it should "detect assertion failures when proving" in {
         try {
-            prove(new ModuleWithBadAssertion).throwErrors()
+            prove(new ModuleAB, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -43,7 +45,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
 
     it should "detect assertion failures when covering" in {
         try {
-            cover(new ModuleWithBadAssertion, 20).throwErrors()
+            cover(new ModuleAB, 20, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -52,7 +54,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
 
     it should "detect assertion failures when running bmc" in {
         try {
-            bmc(new ModuleWithBadAssertion, 20).throwErrors()
+            bmc(new ModuleAB, 20, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
