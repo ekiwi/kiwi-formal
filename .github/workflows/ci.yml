@@ -28,7 +28,8 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          yosys/Makefile
+          yosys/**/Makefile
+          yosys/**/Makefile.inc
           yosys/yosys
           yosys/yosys-abc
           yosys/yosys-filterlib
