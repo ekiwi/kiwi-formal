@@ -28,14 +28,15 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          /usr/local/bin/yosys
-          /usr/local/bin/yosys-abc
-          /usr/local/bin/yosys-filterlib
-          /usr/local/bin/yosys-smtbmc
-          /usr/local/share/yosys
-        key: ${{ runner.os }}-yosys-b000491
+          yosys/Makefile
+          yosys/yosys
+          yosys/yosys-abc
+          yosys/yosys-filterlib
+          yosys/yosys-smtbmc
+          yosys/share/
+        key: ${{ runner.os }}-yosys-b000491-2
 
-    - name: Compile and Install Yosys
+    - name: Compile Yosys
       if: steps.cache-yosys.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/YosysHQ/yosys.git yosys
@@ -47,6 +48,12 @@ jobs:
             libboost-python-dev libboost-filesystem-dev zlib1g-dev
         make config-gcc
         make -j2
+        sudo make install
+        yosys -version
+
+    - name: Install Yosys
+      run: |
+        cd yosys
         sudo make install
         yosys -version
 
