@@ -8,8 +8,10 @@ import dank.formal.backends._
 import org.scalatest._
 import chisel3._
 import chiseltest.experimental.sanitizeFileName
+import dank.formal.transforms.{CoverAllBranchesAnnotation, CoverBranchesTransform}
 import firrtl.AnnotationSeq
-import firrtl.options.TargetDirAnnotation
+import firrtl.options.{Dependency, TargetDirAnnotation}
+import firrtl.stage.RunFirrtlTransformAnnotation
 
 import java.io.File
 import scala.util.DynamicVariable
@@ -46,6 +48,9 @@ trait FormalTester extends Assertions with TestSuiteMixin {
         val dir = finalAnnos.collectFirst { case TargetDirAnnotation(d) => d }.get
         engine.run(dir, op, opts, () => gen, finalAnnos)
     }
+
+    /** Annotation that runs the auto branch coverage transformation */
+    val BranchCoverage = List(RunFirrtlTransformAnnotation(Dependency[CoverBranchesTransform]), CoverAllBranchesAnnotation)
 
     protected def getTestName: String = {
         val ctx = scalaTestContext.value.getOrElse(

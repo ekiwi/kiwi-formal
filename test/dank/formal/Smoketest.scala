@@ -3,7 +3,7 @@ package dank.formal
 import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 
-class SmoketestModule extends FormalModule {
+class SmoketestModule extends Module {
     val io = IO(new Bundle {
         val in = Input(Bool())
         val a = Output(Bool())
@@ -22,18 +22,22 @@ class SmoketestModule extends FormalModule {
         aReg := false.B
         bReg := true.B
     }
+}
 
-    cover(aReg)
-    cover(bReg)
-    assert(aReg ^ bReg)
+class SmoketestSpec(dut: SmoketestModule) extends Spec(dut) {
+    cover(dut.aReg)
+    cover(dut.bReg)
+    assert(dut.aReg ^ dut.bReg)
 }
 
 class Smoketest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "SmoketestModule"
 
+    val annos = List(VerificationAspect[SmoketestModule](new SmoketestSpec(_)))
+
     it should "not smoke" in {
-        cover(new SmoketestModule, 20)
-        prove(new SmoketestModule)
-        bmc(new SmoketestModule, 20)
+        cover(new SmoketestModule, 20, annos)
+        prove(new SmoketestModule, annos)
+        bmc(new SmoketestModule, 20, annos)
     }
 }

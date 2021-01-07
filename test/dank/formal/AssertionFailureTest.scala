@@ -34,9 +34,11 @@ class FailingAssertions(dut: ModuleAB) extends Spec(dut) {
 class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
     behavior of "SbyRun"
 
+    val annos = List(VerificationAspect[ModuleAB](new FailingAssertions(_)))
+
     it should "detect assertion failures when proving" in {
         try {
-            prove(new ModuleAB, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
+            prove(new ModuleAB, annos).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -45,7 +47,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
 
     it should "detect assertion failures when covering" in {
         try {
-            cover(new ModuleAB, 20, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
+            cover(new ModuleAB, 20, annos).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
@@ -54,7 +56,7 @@ class AssertionFailureTest extends AnyFlatSpec with SymbiYosysTester {
 
     it should "detect assertion failures when running bmc" in {
         try {
-            bmc(new ModuleAB, 20, List(VerificationAspect[ModuleAB](new FailingAssertions(_)))).throwErrors()
+            bmc(new ModuleAB, 20, annos).throwErrors()
             assert(false)
         } catch {
             case e: VerificationException => assert(e.message.contains("AssertionFailureTest.scala"))
