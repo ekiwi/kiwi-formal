@@ -27,15 +27,8 @@ jobs:
       id: cache-yosys
       uses: actions/cache@v2
       with:
-        path: |
-          yosys/**/Makefile
-          yosys/**/Makefile.inc
-          yosys/yosys
-          yosys/yosys-abc
-          yosys/yosys-filterlib
-          yosys/yosys-smtbmc
-          yosys/share/
-        key: ${{ runner.os }}-yosys-b000491-2
+        path: yosys
+        key: ${{ runner.os }}-yosys-b000491-3
 
     - name: Compile Yosys
       if: steps.cache-yosys.outputs.cache-hit != 'true'
