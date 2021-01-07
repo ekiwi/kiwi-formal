@@ -1,7 +1,7 @@
 // Copyright 2020 The Regents of the University of California
 // released under BSD 3-Clause License
 // author: Kevin Laeufer <laeufer@cs.berkeley.edu>
-package dank.formal.backends
+package kiwi.formal.backends
 
 import chisel3.RawModule
 import firrtl.AnnotationSeq

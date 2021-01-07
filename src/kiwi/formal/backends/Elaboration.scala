@@ -2,7 +2,7 @@
 // released under BSD 3-Clause License
 // author: Kevin Laeufer <laeufer@cs.berkeley.edu>
 
-package dank.formal.backends
+package kiwi.formal.backends
 
 import chisel3.RawModule
 import chisel3.stage.ChiselGeneratorAnnotation

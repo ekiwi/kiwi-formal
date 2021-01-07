@@ -2,7 +2,7 @@
 // released under BSD 3-Clause License
 // author: Kevin Laeufer <laeufer@cs.berkeley.edu>
 
-package dank.formal
+package kiwi.formal
 
 import chisel3._
 import chisel3.aop.injecting._

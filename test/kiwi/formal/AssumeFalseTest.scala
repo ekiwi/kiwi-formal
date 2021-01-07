@@ -1,9 +1,16 @@
-package dank.formal
+// Copyright 2020 The Regents of the University of California
+// released under BSD 3-Clause License
+// author: Kevin Laeufer <laeufer@cs.berkeley.edu>
+// based on code from dank-formal:
+// Copyright 2020 Daniel Kasza
+// released under Apache License 2.0
+
+package kiwi.formal
 
 import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
 import chisel3.experimental.verification
-import dank.formal.transforms.CoverAllBranchesAnnotation
+import kiwi.formal.transforms.CoverAllBranchesAnnotation
 
 class AssumeFalseModule extends Module {
     val io = IO(new Bundle {

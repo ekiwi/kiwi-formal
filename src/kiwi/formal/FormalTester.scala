@@ -2,13 +2,13 @@
 // released under BSD 3-Clause License
 // author: Kevin Laeufer <laeufer@cs.berkeley.edu>
 
-package dank.formal
+package kiwi.formal
 
-import dank.formal.backends._
+import kiwi.formal.backends._
 import org.scalatest._
 import chisel3._
 import chiseltest.experimental.sanitizeFileName
-import dank.formal.transforms.{CoverAllBranchesAnnotation, CoverBranchesTransform}
+import kiwi.formal.transforms.{CoverAllBranchesAnnotation, CoverBranchesTransform}
 import firrtl.AnnotationSeq
 import firrtl.options.{Dependency, TargetDirAnnotation}
 import firrtl.stage.RunFirrtlTransformAnnotation
