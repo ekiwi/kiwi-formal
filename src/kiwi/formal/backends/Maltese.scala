@@ -24,7 +24,7 @@ class Maltese(checker: IsModelChecker) extends Backend {
     }
 
     val elaborated = Elaboration.elaborate(gen, annos, emitter = "experimental-btor2")
-    val sys = ExpressionConverter.toMaltese(elaborated.annos).get
+    val (sys, comments) = ExpressionConverter.toMaltese(elaborated.annos).get
 
     op match {
       case BoundedCheck(depth) =>
@@ -34,8 +34,9 @@ class Maltese(checker: IsModelChecker) extends Backend {
             val sim = new TransitionSystemSimulator(sys)
             val vcdFile = directory + File.separator + elaborated.name + ".vcd"
             sim.run(witness, Some(vcdFile))
-            val errors = List(s"Failed to verify ${elaborated.name}.\n$vcdFile")
-            VerificationFail(errors)
+            val msg = s"Failed to verify ${elaborated.name} with ${checker.name}"
+            val error = Error("", List(), Some(vcdFile))
+            VerificationFail(msg, List(error))
           case ModelCheckSuccess() =>
             VerificationSuccess
         }

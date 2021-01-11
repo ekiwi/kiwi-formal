@@ -27,10 +27,12 @@ sealed trait VerificationResult {
   def throwErrors(): Unit
 }
 
-case class VerificationFail(errors: Iterable[String]) extends VerificationResult with BoundedCheckResult with BoundedCoverResult with ProveResult {
+case class VerificationFail(msg: String, errors: Iterable[Error], private val format: ErrorFormatter = DefaultErrorFormatter)
+  extends VerificationResult with BoundedCheckResult with BoundedCoverResult with ProveResult {
   assert(errors.nonEmpty)
+  def report: String = (Iterator(msg) ++ errors.map(format.format)).mkString("\n")
   override def throwErrors(): Unit = {
-    throw new VerificationException(errors.mkString("\n"))
+    throw new VerificationException(report)
   }
 }
 

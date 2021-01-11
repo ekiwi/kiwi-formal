@@ -21,10 +21,10 @@ object ExpressionConverter {
     toMaltese(firSmt)
   }
 
-  def toMaltese(annos: AnnotationSeq): Option[mc.TransitionSystem] =
+  def toMaltese(annos: AnnotationSeq): Option[(mc.TransitionSystem, Map[String, String])] =
     annos.collectFirst { case TransitionSystemAnnotation(sys) => sys }.map(toMaltese)
 
-  def toMaltese(sys: TransitionSystem): mc.TransitionSystem = {
+  def toMaltese(sys: TransitionSystem): (mc.TransitionSystem, Map[String, String]) = {
     val inputs = sys.inputs.map(toMaltese)
     val states = sys.states.map(toMaltese)
     val signals = sys.signals.map { s =>
@@ -37,7 +37,7 @@ object ExpressionConverter {
       val expr = if(lbl == mc.IsBad) m.BVNot(eMaltese) else eMaltese
       mc.Signal(s.name, expr, lbl)
     }
-    mc.TransitionSystem(sys.name, inputs.toList, states.toList, signals.toList)
+    (mc.TransitionSystem(sys.name, inputs.toList, states.toList, signals.toList), sys.comments)
   }
 
   private def toMaltese(state: State): mc.State = {

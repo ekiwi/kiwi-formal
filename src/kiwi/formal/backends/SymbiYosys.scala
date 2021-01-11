@@ -10,8 +10,10 @@ package kiwi.formal.backends
 
 import chisel3._
 import firrtl.AnnotationSeq
+
 import java.io._
-import scala.io.Source
+import scala.collection.mutable
+import scala.io.{BufferedSource, Source}
 
 /** SymbiYosys operation. */
 class SymbiYosys(val engines: Seq[String] = List("smtbmc")) extends Backend {
@@ -48,58 +50,53 @@ class SymbiYosys(val engines: Seq[String] = List("smtbmc")) extends Backend {
         // Run SymbiYosys and grab outputs
         val process = new ProcessBuilder("sby", "-f", "-d", directory + File.separator + "sby", jobfile).start()
         val rc = process.waitFor()
+
+        // parse errors from output
         val stdout = Source.fromInputStream(process.getInputStream)
-
-
-
-        // Find all errors.
-        val errors = stdout.getLines().flatMap { line =>
-            if (line.contains("Unreached cover statement at")) {
-                Some(formatError(directory, "unreached cover statement", line.split(" ").last))
-            } else if (line.contains("Assert failed in")) {
-                if (line.contains(" (step ")) {
-                    val location = line.split(" ").dropRight(2).last
-                    val step = line.split(" ").last.dropRight(1).toInt
-                    Some(formatError(directory,"assert failed", location, step))
-                } else {
-                    Some(formatError(directory,"assert failed", line.split(" ").last))
-                }
-            } else if (line.toLowerCase.contains("error")) {
-                Some(line)
-            } else {
-                None
-            }
-        }.toList
+        val errorParser = new SymbiYosysErrorParser(directory)
+        val errors = errorParser.parseLines(stdout.getLines())
         stdout.close()
 
         if (rc != 0) {
-            VerificationFail(List("Sby failed, return code: " + rc.toString) ++ errors)
+            VerificationFail("Sby failed, return code: " + rc.toString, errors)
         } else {
             VerificationSuccess
         }
     }
-
-    /** Helper function for recording errors that occurred on a specific source line. */
-    private def formatError(directory: String, error: String, location: String, step: Int = -1): String = {
-        val sv_file_name = location.split(":")(0)
-        val sv_file_path = directory + File.separator + sv_file_name
-        val sv_line_num = location.split("-").last.split("\\.")(0).toInt
-        val source = Source.fromFile(sv_file_path)
-        val sv_line = source.getLines().toList(sv_line_num - 1)
-        source.close()
-        val scala_location = if (sv_line.contains("// @[")) {
-            "@" + sv_line.split("// @").last
-        } else {
-            "@[unknown]"
-        }
-
-        scala_location +
-          "(" + sv_file_name + ":" + sv_line_num.toString + ") " +
-          error +
-          (if (step == -1) {
-              ""
-          } else {
-              " (step " + step.toString + ")"
-          })
-    }
 }
+
+
+private class SymbiYosysErrorParser(directory: String) extends ErrorParser(directory) {
+    def parseLines(lines: Iterator[String]): List[Error] = {
+        val vcd: Option[String] = None
+        lines.flatMap { line =>
+            if (line.contains("Unreached cover statement at")) {
+                Some(Error("unreached cover statement", getLoc(line.split(" ").last), vcd))
+            } else if (line.contains("Assert failed in")) {
+                if (line.contains(" (step ")) {
+                    val location = line.split(" ").dropRight(2).last
+                    val step = line.split(" ").last.dropRight(1).toInt
+                    Some(Error("assert failed", getLoc(location), vcd, step))
+                } else {
+                    Some(Error("assert failed", getLoc(line.split(" ").last), vcd))
+                }
+            } else if (line.toLowerCase.contains("error")) {
+                Some(Error(line, List(), None))
+            } else {
+                None
+            }
+        }.toList
+    }
+
+    private def getLoc(loc: String): List[ErrorLoc] = {
+        val svLoc = ErrorParser.parseSmtbmcFilename(loc).getOrElse(throw new RuntimeException(s"Failed to parse location: $loc"))
+        val svLine = getLine(directory + File.separator + svLoc.filename, svLoc.endLine)
+        val scalaLocs = svComment(svLine).map(ErrorParser.parseChiselFileInfo).getOrElse(List())
+        List(svLoc) ++ scalaLocs
+    }
+
+    private def svComment(line: String): Option[String] = if(line.contains("//")) {
+        Some(line.split("//").tail.mkString(""))
+    } else { None }
+}
+
