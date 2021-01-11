@@ -17,8 +17,10 @@ jobs:
       id: cache
       uses: actions/cache@v2
       with:
-        path: ext/bin
-        key: ${{ runner.os }}-build-${{ hashFiles('ext/*.sh') }}-0
+        path: |
+          ext/bin
+          ext/share
+        key: ${{ runner.os }}-build-${{ hashFiles('ext/*.sh') }}-2
 
     - name: yices
       if: steps.cache.outputs.cache-hit != 'true'
@@ -56,6 +58,7 @@ jobs:
         cp ext/bin-z3/*    ext/bin/
         cp ext/bin-yosys/* ext/bin/
         ls ext/bin/
+        cp -r ext/share-yosys ext/share
 
     - name: Make Binaries Executable
       run: chmod +x $GITHUB_WORKSPACE/ext/bin/*

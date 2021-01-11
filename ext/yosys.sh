@@ -28,6 +28,7 @@ cd ..
 mkdir -p bin-yosys
 cp yosys-git/yosys bin-yosys/
 cp yosys-git/yosys-* bin-yosys/
+cp yosys-git/share -r share-yosys
 
 # print
 ./bin-yosys/yosys -V
