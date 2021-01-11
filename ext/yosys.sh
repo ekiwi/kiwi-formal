@@ -27,6 +27,7 @@ make -j`nproc`
 cd ..
 mkdir -p bin-yosys
 cp yosys-git/yosys bin-yosys/
+cp yosys-git/yosys-* bin-yosys/
 
 # print
 ./bin-yosys/yosys -V
