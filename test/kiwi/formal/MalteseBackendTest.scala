@@ -2,6 +2,7 @@ package kiwi.formal
 
 import org.scalatest.flatspec.AnyFlatSpec
 import chisel3._
+import kiwi.formal.backends.VerificationException
 
 
 class SimpleCombinatorial extends MultiIOModule {
@@ -23,6 +24,8 @@ class MalteseBackendTest extends AnyFlatSpec with BtormcTester {
   val annos = List(VerificationAspect[SimpleCombinatorial](new SimpleCombinatorialSpec(_)))
 
   it should "fail" in {
-    bmc(new SimpleCombinatorial(), 20, annos).throwErrors()
+    assertThrows[VerificationException] {
+      bmc(new SimpleCombinatorial(), 20, annos).throwErrors()
+    }
   }
 }
