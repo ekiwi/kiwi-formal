@@ -47,5 +47,5 @@ sealed trait ProveResult extends VerificationResult
 
 object Backend {
   def symbiYosys(): Backend = new SymbiYosys()
-  def botrmc(): Backend = ???
+  def botrmc(): Backend = new Maltese(new maltese.mc.BtormcModelChecker())
 }

@@ -21,6 +21,10 @@ trait SymbiYosysTester extends FormalTester { this: TestSuite =>
     override val defaultBackend: Option[() => Backend] = Some(Backend.symbiYosys)
 }
 
+trait BtormcTester extends FormalTester { this: TestSuite =>
+    override val defaultBackend: Option[() => Backend] = Some(Backend.botrmc)
+}
+
 /** FormalTester trait for scalatest, based on code copied from chisel-test */
 trait FormalTester extends Assertions with TestSuiteMixin {
     this: TestSuite =>

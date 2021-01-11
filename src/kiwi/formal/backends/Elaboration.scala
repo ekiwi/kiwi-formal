@@ -5,7 +5,7 @@
 package kiwi.formal.backends
 
 import chisel3.RawModule
-import chisel3.stage.ChiselGeneratorAnnotation
+import chisel3.stage.{ChiselGeneratorAnnotation, ChiselOutputFileAnnotation}
 import firrtl.{AnnotationSeq, EmittedVerilogCircuitAnnotation}
 import firrtl.transforms.BlackBoxInlineAnno
 
@@ -13,10 +13,10 @@ object Elaboration {
   private val compiler = new chisel3.stage.ChiselStage
 
   /** generate verification collateral from a circuit and annotations */
-  def elaborate(gen: () => RawModule, annos: AnnotationSeq): ElaboratedCircuit = {
+  def elaborate(gen: () => RawModule, annos: AnnotationSeq, emitter: String = "sverilog", ll: String = "error"): ElaboratedCircuit = {
 
     val circuitAnno = Seq(ChiselGeneratorAnnotation(gen))
-    val cmds = Array("-X", "sverilog")
+    val cmds = Array("-E", emitter, "-ll", ll)
     val result = compiler.execute(cmds, circuitAnno ++ annos)
 
 
@@ -25,7 +25,7 @@ object Elaboration {
       case a: BlackBoxInlineAnno => Some(a.name)
       case _ => None
     }
-    val name = result.collectFirst{ case a: EmittedVerilogCircuitAnnotation => a.value.name }.get
+    val name = result.collectFirst{ case a: ChiselOutputFileAnnotation => a.file }.get
 
     ElaboratedCircuit(name, files, result)
   }
