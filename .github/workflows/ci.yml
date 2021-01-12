@@ -1,4 +1,4 @@
-name: dank-formal unit tests
+name: kiwi-formal unit tests
 
 on:
   push:
