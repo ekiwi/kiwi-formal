@@ -35,6 +35,11 @@ jobs:
       working-directory: ext
       run: ./btor.sh
 
+    - name: pono
+      if: steps.cache.outputs.cache-hit != 'true'
+      working-directory: ext
+      run: ./pono.sh
+
     - name: z3
       if: steps.cache.outputs.cache-hit != 'true'
       working-directory: ext
@@ -53,6 +58,7 @@ jobs:
         cp ext/lib-yices/* ext/bin/
         cp ext/bin-cvc4/*  ext/bin/
         cp ext/bin-btor/*  ext/bin/
+        cp ext/bin-pono/*  ext/bin/
         cp ext/bin-z3/*    ext/bin/
         cp ext/bin-yosys/* ext/bin/
         cp -r ext/share-yosys ext/bin/share
@@ -80,6 +86,10 @@ jobs:
         echo "Btormc"
         btormc --version --copyright
         which btormc
+        echo ""
+        echo "Pono"
+        pono --help
+        which pono
         echo ""
         echo "Z3"
         z3 --version
