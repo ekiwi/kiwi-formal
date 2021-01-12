@@ -7,20 +7,20 @@ import kiwi.formal.backends.{VerificationFail, VerificationSuccess}
 import org.scalatest.flatspec.AnyFlatSpec
 
 class SimpleFSM extends MultiIOModule {
-  val a = IO(Input(Bool()))
-  val b = IO(Output(Bool()))
-  b := false.B
+  val in = IO(Input(Bool()))
+  val out = IO(Output(Bool()))
+  out := false.B
 
   val state = RegInit(0.U(2.W))
 
   switch(state) {
     is(0.U) {
-      state := Mux(a, 1.U, 0.U)
-      b := !a
+      state := Mux(in, 1.U, 0.U)
+      out := !in
     }
     is(1.U) {
-      state := Mux(a, 2.U, 0.U)
-      b := a
+      state := Mux(in, 2.U, 0.U)
+      out := in
     }
   }
 }
@@ -49,16 +49,16 @@ class FSMStateSequenceCover(f: SimpleFSM) extends Spec(f) {
 }
 class FSMInputOutputAssert(f: SimpleFSM) extends Spec(f) {
   // a && b may never be true for two consecutive cycles
-  assert(!(past(f.a && f.b) && (f.a && f.b)))
+  assert(!(past(f.in && f.out) && (f.in && f.out)))
 }
 
 class FSMOutputAlwaysOne(f: SimpleFSM) extends Spec(f) {
-  assert(f.b)
+  assert(f.out)
 }
 
 class FSMOutputAlwaysOneAssumingInputIsZero(f: SimpleFSM) extends Spec(f) {
-  assume(!f.a)
-  assert(f.b)
+  assume(!f.in)
+  assert(f.out)
 }
 
 class StateMachineTest extends AnyFlatSpec with SymbiYosysTester {
