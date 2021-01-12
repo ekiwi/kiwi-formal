@@ -89,7 +89,7 @@ private class SymbiYosysErrorParser(directory: String) extends ErrorParser(direc
     }
 
     private def getLoc(loc: String): List[ErrorLoc] = {
-        val svLoc = ErrorParser.parseSmtbmcFilename(loc).getOrElse(throw new RuntimeException(s"Failed to parse location: $loc"))
+        val svLoc = ErrorParser.parseSmtbmcFilename(loc).getOrElse(throw new RuntimeException(s"Failed to parse location: `$loc`"))
         val svLine = getLine(directory + File.separator + svLoc.filename, svLoc.endLine)
         val scalaLocs = svComment(svLine).map(ErrorParser.parseChiselFileInfo).getOrElse(List())
         List(svLoc) ++ scalaLocs

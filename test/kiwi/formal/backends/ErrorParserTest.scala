@@ -21,6 +21,15 @@ class ErrorParserTest extends AnyFlatSpec {
     assert(loc.endCol == 22)
   }
 
+  it should "correctly parse a smtbmc generated error location even if there is a trailing dot" in {
+    val loc = ErrorParser.parseSmtbmcFilename("ModuleWithUnreachableStatements.sv:23.34-24.23.").get
+    assert(loc.filename == "ModuleWithUnreachableStatements.sv")
+    assert(loc.line == 23)
+    assert(loc.col == 34)
+    assert(loc.endLine == 24)
+    assert(loc.endCol == 23)
+  }
+
   it should "correctly parse chisel/firrtl generated locations (FileInfo)" in {
     val inp = ir.FileInfo("test.scala 11:15")
     val loc = ErrorParser.parseChiselFileInfo(inp.serialize)

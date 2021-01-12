@@ -46,7 +46,7 @@ private class ErrorParser(directory: String) {
 
 private object ErrorParser {
   // e.g.: SimpleCombinatorial.sv:15.20-16.22
-  private val smtbmc: Regex = raw"([^\.]+\.\w+):(\d+)\.(\d+)\-(\d+)\.(\d+)".r
+  private val smtbmc: Regex = raw"([^\.]+\.\w+):(\d+)\.(\d+)\-(\d+)\.(\d+).*".r
   def parseSmtbmcFilename(line: String): Option[ErrorLoc] = {
     line match {
       case smtbmc(filename, startLine, startCol, endLine, endCol) =>
