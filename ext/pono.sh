@@ -10,7 +10,7 @@ rm -rf pono-*
 
 # install ubuntu packets
 if [ `lsb_release -si` == "Ubuntu" ]; then
-sudo apt install -y build-essential clang bison flex python3-dev libgmp-dev antlr4 libantlr4-runtime-dev
+sudo apt-get install -y build-essential bison flex python3-dev libgmp-dev libantlr3c-dev
 fi
 
 
