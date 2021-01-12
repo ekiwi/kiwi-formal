@@ -78,7 +78,6 @@ class StateMachineTest extends AnyFlatSpec with SymbiYosysTester {
   it should "only get stuck in state 2" in {
     cover(new SimpleFSM(), 20, withSpec(new FSMStateSequenceCover(_))) match {
       case v : VerificationFail =>
-        println(v.report)
         assert(v.errors.size == 1, "expected exactly one error")
       case VerificationSuccess =>
         assert(false, "expected this test to fail!")
@@ -92,7 +91,6 @@ class StateMachineTest extends AnyFlatSpec with SymbiYosysTester {
   it should "allow the output to be 0" in {
     bmc(new SimpleFSM(), 20, withSpec(new FSMOutputAlwaysOne(_))) match {
       case v : VerificationFail =>
-        println(v.report)
         assert(v.errors.size == 1, "expected exactly one error")
       case VerificationSuccess =>
         assert(false, "expected this test to fail!")
