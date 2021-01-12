@@ -7,7 +7,6 @@ package kiwi.formal
 import kiwi.formal.backends._
 import org.scalatest._
 import chisel3._
-import chiseltest.experimental.sanitizeFileName
 import kiwi.formal.transforms.{CoverAllBranchesAnnotation, CoverBranchesTransform}
 import firrtl.AnnotationSeq
 import firrtl.options.{Dependency, TargetDirAnnotation}
@@ -61,6 +60,9 @@ trait FormalTester extends Assertions with TestSuiteMixin {
             throw new RuntimeException("No test context found! Make sure you are in a unittest.")
         )
         sanitizeFileName(ctx.name)
+    }
+    private def sanitizeFileName(name: String): String = {
+        name.replaceAll(" ", "_").replaceAll("\\W+", "") // sanitize name
     }
 
     // Provide test fixture data as part of 'global' context during test runs
