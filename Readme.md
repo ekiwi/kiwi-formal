@@ -1,4 +1,4 @@
-# kiwi-formal
+# kiwi-formal ![kiwi-formal unit tests](https://github.com/ekiwi/kiwi-formal/workflows/kiwi-formal%20unit%20tests/badge.svg?branch=main)
 
 Experimental (formal) verification library for Chisel designs.
 
