@@ -5,11 +5,14 @@
 package kiwi.formal
 
 import chisel3._
+import chisel3.aop.Select
 import chisel3.aop.injecting._
 import chisel3.experimental.{ChiselAnnotation, annotate, verification}
 import chisel3.internal.sourceinfo.SourceInfo
 import chisel3.util.ShiftRegister
 import firrtl.annotations.PresetAnnotation
+
+import scala.reflect.ClassTag
 
 
 abstract class Spec[M <: MultiIOModule](dut: M) {
@@ -87,7 +90,7 @@ abstract class Spec[M <: MultiIOModule](dut: M) {
   * This is a very basic implementation that only supports writing assertions over a single module at a time.
   * It also lacks any checks to ensure that the circuit is only observed and not modified.
   * */
-case class VerificationAspect[M <: MultiIOModule](spec: M => Spec[M]) extends InjectorAspect[M, M](
-  { dut: M => List(dut) },
+case class VerificationAspect[M <: MultiIOModule](spec: M => Spec[M])(implicit c: ClassTag[M]) extends InjectorAspect[M, M](
+  { top: RawModule => Select.collectDeep(top){ case dut: M => dut } },
   { dut: M => spec(dut) }
 )
