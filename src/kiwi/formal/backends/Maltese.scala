@@ -7,6 +7,9 @@ package kiwi.formal.backends
 import chisel3.RawModule
 import firrtl.AnnotationSeq
 import firrtl.backends.experimental.smt.ExpressionConverter
+import firrtl.options.Dependency
+import firrtl.passes.InlineInstances
+import firrtl.stage.RunFirrtlTransformAnnotation
 import maltese.mc._
 
 import java.io.File
@@ -23,7 +26,11 @@ class Maltese(checker: IsModelChecker) extends Backend {
       case _ =>
     }
 
-    val elaborated = Elaboration.elaborate(gen, annos, emitter = "experimental-btor2")
+    // The firrtl SMT backend expects all submodules that are part of the implementation to be inlined.
+    // Any DoNotInline annotation from the `state.annotations` will prevent that particular module to be inlined.
+    val doFlatten = Seq(RunFirrtlTransformAnnotation(Dependency(FlattenPass)),
+      RunFirrtlTransformAnnotation(Dependency[InlineInstances]))
+    val elaborated = Elaboration.elaborate(gen, annos ++ doFlatten, emitter = "experimental-btor2")
     val (sys, comments) = ExpressionConverter.toMaltese(elaborated.annos).get
 
     op match {
