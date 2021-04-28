@@ -31,7 +31,7 @@ class Maltese(checker: IsModelChecker) extends Backend {
     val doFlatten = Seq(RunFirrtlTransformAnnotation(Dependency(FlattenPass)),
       RunFirrtlTransformAnnotation(Dependency[InlineInstances]))
     val elaborated = Elaboration.elaborate(gen, annos ++ doFlatten, emitter = "experimental-btor2")
-    val (sys, comments) = ExpressionConverter.toMaltese(elaborated.annos).get
+    val sys = ExpressionConverter.toMaltese(elaborated.annos).get
 
     op match {
       case BoundedCheck(depth) =>

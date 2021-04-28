@@ -7,7 +7,8 @@ lazy val commonSettings = Seq(
   resolvers ++= Seq(Resolver.sonatypeRepo("snapshots")),
   libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.5-SNAPSHOT",
   libraryDependencies += "edu.berkeley.cs" %% "treadle" % "1.5-SNAPSHOT",
-  // Chisel STable Releases
+  libraryDependencies += "edu.berkeley.cs" %% "maltese-smt" % "0.5-SNAPSHOT",
+  // Chisel Stable Releases
   //libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.4.1",
   //libraryDependencies += "edu.berkeley.cs" %% "treadle" % "1.3.1",
   libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.3",
