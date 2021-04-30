@@ -18,7 +18,7 @@ case class DoNotInlineAnnotation(target: ModuleTarget) extends SingleTargetAnnot
 
 /** Annotates the complete hierarchy to be flattened. */
 object FlattenPass extends Transform with DependencyAPIMigration {
-  override def prerequisites = Forms.WorkingIR
+  override def prerequisites = Forms.MinimalHighForm
   // this pass relies on modules not being dedupped yet
   override def optionalPrerequisiteOf = Seq(Dependency[firrtl.transforms.DedupModules])
   override def invalidates(a: Transform): Boolean = false

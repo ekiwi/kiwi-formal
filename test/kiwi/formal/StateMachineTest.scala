@@ -6,7 +6,7 @@ import chisel3.util._
 import kiwi.formal.backends.{VerificationFail, VerificationSuccess}
 import org.scalatest.flatspec.AnyFlatSpec
 
-class SimpleFSM extends MultiIOModule {
+class SimpleFSM extends Module {
   val in = IO(Input(Bool()))
   val out = IO(Output(Bool()))
   out := false.B

@@ -15,7 +15,7 @@ import firrtl.annotations.PresetAnnotation
 import scala.reflect.ClassTag
 
 
-abstract class Spec[M <: MultiIOModule](dut: M) {
+abstract class Spec[M <: Module](dut: M) {
   /** signal that indicates when the circuit has gone through reset */
   lazy val resetDone: Bool = {
     val preset = WireInit(false.B.asAsyncReset())
@@ -90,7 +90,7 @@ abstract class Spec[M <: MultiIOModule](dut: M) {
   * This is a very basic implementation that only supports writing assertions over a single module at a time.
   * It also lacks any checks to ensure that the circuit is only observed and not modified.
   * */
-case class VerificationAspect[M <: MultiIOModule](spec: M => Spec[M])(implicit c: ClassTag[M]) extends InjectorAspect[M, M](
+case class VerificationAspect[M <: Module](spec: M => Spec[M])(implicit c: ClassTag[M]) extends InjectorAspect[M, M](
   { top: RawModule => Select.collectDeep(top){ case dut: M => dut } },
   { dut: M => spec(dut) }
 )

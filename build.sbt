@@ -2,6 +2,7 @@ lazy val commonSettings = Seq(
   organization := "edu.berkeley.cs",
   version := "0.5-SNAPSHOT",
   scalaVersion := "2.13.5",
+  scalacOptions ++= Seq("-deprecation", "-feature", "-language:reflectiveCalls"),
   // Chisel Snapshot Releases
   resolvers ++= Seq(Resolver.sonatypeRepo("snapshots")),
   libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.5-SNAPSHOT",

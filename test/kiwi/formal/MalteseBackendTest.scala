@@ -5,7 +5,7 @@ import chisel3._
 import kiwi.formal.backends.VerificationException
 
 
-class SimpleCombinatorial extends MultiIOModule {
+class SimpleCombinatorial extends Module {
   val a = IO(Input(UInt(8.W)))
   val b = IO(Input(UInt(8.W)))
   val sum = a + b

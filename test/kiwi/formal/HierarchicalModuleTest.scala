@@ -8,7 +8,7 @@ import chisel3._
 import kiwi.formal.backends.{VerificationFail, VerificationSuccess}
 import org.scalatest.flatspec.AnyFlatSpec
 
-class FsmWrapper extends MultiIOModule {
+class FsmWrapper extends Module {
   val in = IO(Input(Bool()))
   val out = IO(Output(Bool()))
   val fsm = Module(new SimpleFSM)
