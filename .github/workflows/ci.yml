@@ -2,9 +2,10 @@ name: kiwi-formal unit tests
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+  schedule:
+    # test every day at noon (PST) to check for new dependency changes
+    - cron: '0 19 * * *'
 
 jobs:
   test:
